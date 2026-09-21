@@ -19,7 +19,7 @@
  * Difficulty: 1
  */
 int bitAnd(int x, int y) {
-    return 2;
+    return ~(~x|~y);
 }
 
 /*
@@ -30,7 +30,7 @@ int bitAnd(int x, int y) {
  *   Difficulty: 1
  */
 int bitXor(int x, int y) {
-    return 2;
+    return (~(x&y))&(~(~x&~y));
 }
 
 /*
@@ -50,7 +50,19 @@ int bitXor(int x, int y) {
  *   1 if x and y have the same sign , 0 otherwise.
  */
 int samesign(int x, int y) {
-    return 2;
+    if(x)
+        if(y)
+            if((x>>31)^(y>>31))
+                return 0;
+            else
+                return 1;
+        else
+            return 0;
+    else
+        if(y)
+            return 0;
+        else
+            return 1;
 }
 
 /*
@@ -63,7 +75,24 @@ int samesign(int x, int y) {
  *   Difficulty: 4
  */
 int logtwo(int v) {
-    return 2;
+    int answer = 0;
+    int shift = 0;
+    shift = ((v >> 16) > 0) << 4;
+    answer = answer | shift;
+    v = v >> shift;
+    shift = ((v >> 8) > 0) << 3;
+    answer = answer | shift;
+    v = v >> shift;
+    shift = ((v >> 4) > 0) << 2;
+    answer = answer | shift;
+    v = v >> shift;
+    shift = ((v >> 2) > 0) << 1;
+    answer = answer | shift;
+    v = v >> shift;
+    shift = ((v >> 1) > 0);
+    answer = answer | shift;
+    v = v >> shift;
+    return answer;
 }
 
 /*
@@ -76,7 +105,19 @@ int logtwo(int v) {
  *    Difficulty: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+    int check = 0x000000FF;
+    int an , am;
+    n = n << 3;
+    m = m << 3;
+    an = (x >> n) & check;
+    am = (x >> m) & check;
+    // printf("%d %d %d %d %d\n", x, an, am, n, m);
+    int answer = x;
+    answer = answer ^ (an << n);
+    answer = answer ^ (am << m);
+    answer = answer ^ (an << m);
+    answer = answer ^ (am << n);
+    return answer;
 }
 
 /*
@@ -88,7 +129,16 @@ int byteSwap(int x, int n, int m) {
  *   Difficulty: 3
  */
 unsigned reverse(unsigned v) {
-    return 2;
+    int i = 32;
+    unsigned answer = 0;
+    while (i)
+    {
+        answer = answer << 1;
+        answer = answer | (v & 1);
+        v = v >> 1;
+        i = i + (-1);
+    }
+    return answer;
 }
 
 /*
