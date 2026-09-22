@@ -129,16 +129,22 @@ int byteSwap(int x, int n, int m) {
  *   Difficulty: 3
  */
 unsigned reverse(unsigned v) {
-    int i = 32;
-    unsigned answer = 0;
-    while (i)
-    {
-        answer = answer << 1;
-        answer = answer | (v & 1);
-        v = v >> 1;
-        i = i + (-1);
-    }
-    return answer;
+    // int i = 32;
+    // unsigned answer = 0;
+    // while (i)
+    // {
+    //     answer = answer << 1;
+    //     answer = answer | (v & 1);
+    //     v = v >> 1;
+    //     i = i + (-1);
+    // }
+    // return answer;
+    v = (v >> 16 & 0x0000FFFF) + (v << 16 & 0xFFFF0000);
+    v = (v >> 8 & 0x00FF00FF) + (v << 8 & 0xFF00FF00);
+    v = (v >> 4 & 0x0F0F0F0F) + (v << 4 & 0xF0F0F0F0);
+    v = (v >> 2 & 0x33333333) + (v << 2 & 0xCCCCCCCC);
+    v = (v >> 1 & 0x55555555) + (v << 1 & 0xAAAAAAAA);
+    return v;
 }
 
 /*
@@ -149,8 +155,14 @@ unsigned reverse(unsigned v) {
  *   Max ops: 20
  *   Difficulty: 3
  */
+// int printf(const char *format, ...);
 int logicalShift(int x, int n) {
-    return 2;
+    int answer = x,check = 0,minus_1 = 0xFFFFFFFF;
+    answer = answer >> n;
+    check = !(!n) << 31;
+    check = ~(check >> (n + minus_1));
+    // printf("%d %d %d %d\n",x,n,answer,check);
+    return answer & check;
 }
 
 /*
