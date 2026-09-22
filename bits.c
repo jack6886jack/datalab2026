@@ -174,7 +174,25 @@ int logicalShift(int x, int n) {
  *   Difficulty: 4
  */
 int leftBitCount(int x) {
-    return 2;
+    int answer = 0, shift;
+    shift = !((x & 0xFFFF0000) ^ 0xFFFF0000) << 4;
+    answer += shift;
+    x = x << shift;
+    shift = !((x & 0xFF000000) ^ 0xFF000000) << 3;
+    answer += shift;
+    x = x << shift;
+    shift = !((x & 0xF0000000) ^ 0xF0000000) << 2;
+    answer += shift;
+    x = x << shift;
+    shift = !((x & 0xC0000000) ^ 0xC0000000) << 1;
+    answer += shift;
+    x = x << shift;
+    shift = !((x & 0x80000000) ^ 0x80000000);
+    answer += shift;
+    x = x << shift;
+    shift = !((x & 0x80000000) ^ 0x80000000);
+    answer += shift;
+    return answer;
 }
 
 /*
