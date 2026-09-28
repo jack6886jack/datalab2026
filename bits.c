@@ -204,7 +204,39 @@ int leftBitCount(int x) {
  *   Difficulty: 4
  */
 unsigned float_i2f(int x) {
-    return 2;
+    unsigned answer = 0, temp = x, cnt = 0;
+    if (x < 0)
+    {
+        answer = 0x80000000;
+        temp = -temp;
+    }
+    // printf("%08x\n",temp);
+    if (temp == 0)
+        return answer;
+    while(!(temp & 0x80000000))
+    {
+        cnt = cnt + 1;
+        temp = temp << 1;
+    }
+    unsigned jiema = (158 - cnt) << 23;
+    if (cnt < 8)
+    {
+        unsigned remove = (temp << 24) >> (cnt + 24), check = 1 << (7-cnt);
+        // printf("%08x\n",remove);
+        if ((remove > check)|((remove == check)&((temp & 0x00000100) == 0x00000100)))
+        {
+            temp += 0x00000100;
+            if((temp & 0xFFFFFF00) == 0)
+            {
+                temp = 0x80000000;
+                jiema += 0x00800000;
+            }
+        }
+    }
+    temp = temp >> 8;
+    // printf("%08x %08x %08x\n", answer, jiema, temp);
+    answer = answer | (jiema & 0x7F800000) | (temp & 0x007FFFFF);
+    return answer;
 }
 
 /*
