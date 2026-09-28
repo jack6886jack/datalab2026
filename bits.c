@@ -218,7 +218,7 @@ unsigned float_i2f(int x) {
         cnt = cnt + 1;
         temp = temp << 1;
     }
-    unsigned jiema = (158 - cnt) << 23;
+    unsigned exp = (158 - cnt) << 23;
     if (cnt < 8)
     {
         unsigned remove = (temp << 24) >> (cnt + 24), check = 1 << (7-cnt);
@@ -229,13 +229,13 @@ unsigned float_i2f(int x) {
             if((temp & 0xFFFFFF00) == 0)
             {
                 temp = 0x80000000;
-                jiema += 0x00800000;
+                exp += 0x00800000;
             }
         }
     }
     temp = temp >> 8;
-    // printf("%08x %08x %08x\n", answer, jiema, temp);
-    answer = answer | (jiema & 0x7F800000) | (temp & 0x007FFFFF);
+    // printf("%08x %08x %08x\n", answer, exp, temp);
+    answer = answer | (exp & 0x7F800000) | (temp & 0x007FFFFF);
     return answer;
 }
 
@@ -251,7 +251,13 @@ unsigned float_i2f(int x) {
  *   Difficulty: 4
  */
 unsigned floatScale2(unsigned uf) {
-    return 2;
+    unsigned exp = (uf >> 23) & 0x000000FF, flag = uf >> 31, frac = uf & 0x007FFFFF;
+    if (exp == 0x000000FF) return uf;
+    if (exp == 0) return (uf << 1) | (flag << 31);
+    exp++;
+    if (exp == 255)
+        frac = 0;
+    return ((flag << 31) | (exp << 23)) | frac;
 }
 
 /*
@@ -268,7 +274,16 @@ unsigned floatScale2(unsigned uf) {
  *   Difficulty: 3
  */
 int float64_f2i(unsigned uf1, unsigned uf2) {
-    return 2;
+    unsigned exp = (uf2 >> 20) & 0x000007FF, flag = uf2 >> 31, frac1 = uf2 & 0x000FFFFF, frac2 = uf1;
+    int e = exp - 1023;
+    
+    if (e >= 31) return 0x80000000;
+    if (e < 0) return 0;
+    unsigned answer = ((frac1 | 0x00100000) << 11) | ((frac2 & 0xFFE00000) >> 21);
+    // printf("%d %08x\n",e,answer);
+    answer = (answer >> (31 - e));
+    if (flag) answer = ~ answer + 1;
+    return answer;
 }
 
 /*
@@ -285,5 +300,9 @@ int float64_f2i(unsigned uf1, unsigned uf2) {
  *   Difficulty: 4
  */
 unsigned floatPower2(int x) {
+    if (x > 127) return 0x7F800000;
+    if (x < -149) return 0;
+    if ((x >= -149)&(x <= -127)) return (1 <<(x + 149));
+    else return ((x + 127) << 23);
     return 2;
 }
